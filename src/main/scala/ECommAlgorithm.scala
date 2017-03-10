@@ -96,14 +96,17 @@ class ECommAlgorithm(val ap: ECommAlgorithmParams)
     val seed = ap.seed.getOrElse(System.nanoTime)
 
     // use ALS to train feature vectors
-    val m = ALS.trainImplicit(
-      ratings = mllibRatings,
-      rank = ap.rank,
-      iterations = ap.numIterations,
-      lambda = ap.lambda,
-      blocks = -1,
-      alpha = 1.0,
-      seed = seed)
+    val als = new ALS()
+    als.setUserBlocks(-1)
+    als.setProductBlocks(-1)
+    als.setRank(ap.rank)
+    als.setIterations(ap.numIterations)
+    als.setLambda(ap.lambda)
+    als.setImplicitPrefs(false)
+    als.setAlpha(1.0)
+    als.setSeed(seed)
+    //als.setCheckpointInterval(2)
+    val m = als.run(mllibRatings)
 
     val userFeatures = m.userFeatures.collectAsMap.toMap
 
